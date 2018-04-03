@@ -75,6 +75,18 @@ void currentListener::stopCallback(const std_msgs::String::ConstPtr &msg) {
     back = 1;
   }  
 
+  if (condition.compare("stop") == 0) {
+    for (int i = 0; i < DOF_JOINTS; i++) 
+      stop_table[i] = 1;
+    back = 0;
+  } 
+
+  if (condition.compare("close") == 0) {
+    for (int i = 0; i < DOF_JOINTS; i++) 
+      stop_table[i] = 0;
+    back = 0;
+  }  
+
   if (condition.compare("little_tactile") == 0) {
     for (int i = 8; i < 12; i++) 
       stop_table[i] = 1;

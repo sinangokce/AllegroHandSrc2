@@ -249,10 +249,22 @@ void AHKeyboard::keyLoop()
         break;  
 
       case KEYCODE_q:
-        ROS_DEBUG("b_key: Back");
+        ROS_DEBUG("q_key: open");
         ss << "open";
         dirty = true;
         break;   
+
+      case KEYCODE_w:
+        ROS_DEBUG("w_key: stop");
+        ss << "stop";
+        dirty = true;
+        break;   
+
+      case KEYCODE_e:
+        ROS_DEBUG("b_key: close");
+        ss << "close";
+        dirty = true;
+        break;  
     }
 
     if(dirty ==true)

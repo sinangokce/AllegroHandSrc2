@@ -66,10 +66,7 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
     stop_pub.publish(stop_msg);
   }
 
-  if (grasp_type.compare("open") == 0) {
-
-    for (int i = 0; i < DOF_JOINTS; i++)
-      desired_position[i] = DEGREES_TO_RADIANS(home_pose[i]); 
+  else if (grasp_type.compare("open") == 0) {
 
     for (int i = 0; i < DOF_JOINTS; i++) {
       joint[i] = 0;
@@ -79,6 +76,35 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
     reverse = 1;
     back = 1;
     stop_ss << "open";
+    stop_msg.data = stop_ss.str();
+    stop_pub.publish(stop_msg);
+  }
+
+  else if (grasp_type.compare("stop") == 0) {
+
+    ROS_INFO("asd");
+    for (int i = 0; i < DOF_JOINTS; i++) {
+      joint[i] = 0;
+      stop_table[i] = 0;
+    }
+
+    reverse = 0;
+    back = 0;
+    stop_ss << "stop";
+    stop_msg.data = stop_ss.str();
+    stop_pub.publish(stop_msg);
+  }
+
+  else if (grasp_type.compare("close") == 0) {
+
+    for (int i = 0; i < DOF_JOINTS; i++) {
+      joint[i] = 0;
+      stop_table[i] = 0;
+    }
+
+    reverse = 0;
+    back = 0;
+    stop_ss << "close";
     stop_msg.data = stop_ss.str();
     stop_pub.publish(stop_msg);
   }
@@ -245,7 +271,6 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
   }
 //The stop condition if hand moves forward
   else if (back != 1){
-    ROS_INFO("no back");
     for (int i = 0; i < DOF_JOINTS; i++) {
       if (current_state.position[i] >= desired_position[i]) 
         joint[i] = 1;
