@@ -16,6 +16,8 @@ double current_position[DOF_JOINTS] = {0.0};
 double previous_position[DOF_JOINTS] = {0.0};
 double distance[DOF_JOINTS] = {0.0};
 int back = 0;
+int reverse = 0;
+int reverse_table[16];
 
 AllegroNodeGraspController::AllegroNodeGraspController() {
          
@@ -74,6 +76,7 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
       stop_table[i] = 0;
     }
 
+    reverse = 1;
     back = 1;
     stop_ss << "back";
     stop_msg.data = stop_ss.str();
@@ -167,7 +170,7 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
       current_state.position[i] = 0.0;
     }
     
-    current_state.position[12] = 1.05;
+    current_state.position[12] = 0.0;
   
     for (int i = 13; i < DOF_JOINTS; i++) {
       current_state.position[i] = 0.0;
@@ -178,6 +181,7 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
       current_state.velocity[i] = (distance[i]/8000);
       joint[i] = 0;
       stop_table[i] = 0;
+      reverse_table[i] = 0;
     }
     
     condinit = 0;
@@ -191,13 +195,24 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
 
 //The stop condition changes if the hand moves back
   if (back == 1) {
-    ROS_INFO("back");
+
+    if (reverse == 1) {
+      for (int i = 0; i < DOF_JOINTS; i++) {
+        if (current_state.position[i] < 0.0) 
+        reverse_table[i] = 1;
+      }
+    }
+  
+    reverse = 0;
+
     for (int i = 0; i < 12; i++) {
-      if (current_state.position[i] <= 0.0) 
+      if (reverse_table[i] == 0 && current_state.position[i] <= 0.0) 
+        joint[i] = 1;
+      else if(reverse_table[i] == 1 && current_state.position[i] >= 0.0)
         joint[i] = 1;
     }
 
-    if (current_state.position[12] <= 1.05) 
+    if (current_state.position[12] <= 0.0) 
         joint[12] = 1;
 
     for (int i = 13; i < DOF_JOINTS; i++) {
@@ -212,7 +227,7 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
     }
 
     if (joint[12] == 1 && stop_table[12] == 0) {
-        current_state.position[12] = 1.05;
+        current_state.position[12] = 0.0;
       }
 
     for (int i = 13; i < DOF_JOINTS; i++) {
@@ -220,8 +235,6 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
         current_state.position[i] = 0;
       }
     }  
-
-
 
     for (int i = 0; i < (DOF_JOINTS); i++)
     {
