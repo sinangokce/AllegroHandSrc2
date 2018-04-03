@@ -128,29 +128,20 @@ void currentListener::currentListenerCallback(const sensor_msgs::JointState &msg
     std::vector<double> each_step;
     for(int i = 0; i < DOF_JOINTS; i++){
       each_step.push_back(current_joint_state.position[i]);
-      //std::cout << each_step[i] << std::endl;
     }
     history.push_back(each_step);
     each_step.clear();
     std::vector<int>::size_type h = (history.size()-1);
     step_counter = h; 
-    //std::cout <<  h << std::endl;
   }
-  //std::cout << "yoyoyo :" << step_counter << std::endl;
   
-  for(step_counter; step_counter>0; --step_counter)
-    for (int i = 0; i < DOF_JOINTS; i++) {
-      std::cout << history[step_counter][i] << std::endl;
-      //ROS_INFO("sdasds");
-    }
-
-
   if (back == 1){
     for (int i = 0; i < DOF_JOINTS; i++) {
       //current_joint_state.position[i] = current_joint_state.position[i] - velocity[i] / dt; //0.001; //velocity[i]*dt;
-      current_joint_state.position[i] = history[h][i];
+      current_joint_state.position[i] = history[step_counter][i];
       history.pop_back();
     }
+    step_counter = step_counter -1; 
   }
   else {
     for (int i = 0; i < (int)DOF_JOINTS; i++) {
