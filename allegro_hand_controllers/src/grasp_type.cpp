@@ -66,7 +66,7 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
     stop_pub.publish(stop_msg);
   }
 
-  if (grasp_type.compare("back") == 0) {
+  if (grasp_type.compare("open") == 0) {
 
     for (int i = 0; i < DOF_JOINTS; i++)
       desired_position[i] = DEGREES_TO_RADIANS(home_pose[i]); 
@@ -78,7 +78,7 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
 
     reverse = 1;
     back = 1;
-    stop_ss << "back";
+    stop_ss << "open";
     stop_msg.data = stop_ss.str();
     stop_pub.publish(stop_msg);
   }

@@ -248,9 +248,9 @@ void AHKeyboard::keyLoop()
         dirty = true;
         break;  
 
-      case KEYCODE_b:
+      case KEYCODE_q:
         ROS_DEBUG("b_key: Back");
-        ss << "back";
+        ss << "open";
         dirty = true;
         break;   
     }

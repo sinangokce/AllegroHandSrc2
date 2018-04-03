@@ -69,7 +69,7 @@ void currentListener::stopCallback(const std_msgs::String::ConstPtr &msg) {
     back = 0;
   }
 
-  if (condition.compare("back") == 0) {
+  if (condition.compare("open") == 0) {
     for (int i = 0; i < DOF_JOINTS; i++) 
       stop_table[i] = 0;
     back = 1;
