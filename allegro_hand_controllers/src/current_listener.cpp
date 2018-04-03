@@ -9,8 +9,8 @@
 #include <sstream>
 #include "ros/ros.h"
 #include "std_msgs/Float32.h"
+#include <vector>
 
-#include <string>
 
 #include "sensor_msgs/JointState.h"
 
@@ -27,6 +27,9 @@ double dt;
 int stop_table[16];
 bool cond;
 int back = 0;
+int step_counter = 0;
+
+
 
 class currentListener
 {
@@ -43,6 +46,9 @@ class currentListener
   ros::Subscriber stop_sub;
   ros::Publisher next_state_pub;
   sensor_msgs::JointState current_joint_state;
+
+  std::vector< std::vector<double> > history;
+  std::vector<int>::size_type h = 0;
 };
 
 currentListener::currentListener() {
@@ -117,10 +123,33 @@ void currentListener::currentListenerCallback(const sensor_msgs::JointState &msg
     else 
       velocity[i] = current_joint_state.velocity[i];
   }
+
+  if(back != 1) {
+    std::vector<double> each_step;
+    for(int i = 0; i < DOF_JOINTS; i++){
+      each_step.push_back(current_joint_state.position[i]);
+      //std::cout << each_step[i] << std::endl;
+    }
+    history.push_back(each_step);
+    each_step.clear();
+    std::vector<int>::size_type h = (history.size()-1);
+    step_counter = h; 
+    //std::cout <<  h << std::endl;
+  }
+  //std::cout << "yoyoyo :" << step_counter << std::endl;
   
+  for(step_counter; step_counter>0; --step_counter)
+    for (int i = 0; i < DOF_JOINTS; i++) {
+      std::cout << history[step_counter][i] << std::endl;
+      //ROS_INFO("sdasds");
+    }
+
+
   if (back == 1){
-    for (int i = 0; i < (int)DOF_JOINTS; i++) {
-      current_joint_state.position[i] = current_joint_state.position[i] - velocity[i] / dt; //0.001; //velocity[i]*dt;
+    for (int i = 0; i < DOF_JOINTS; i++) {
+      //current_joint_state.position[i] = current_joint_state.position[i] - velocity[i] / dt; //0.001; //velocity[i]*dt;
+      current_joint_state.position[i] = history[h][i];
+      history.pop_back();
     }
   }
   else {
