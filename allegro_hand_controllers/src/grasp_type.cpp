@@ -18,6 +18,8 @@ double distance[DOF_JOINTS] = {0.0};
 int back = 0;
 int reverse = 0;
 int reverse_table[16];
+int first_run;
+int went_back = 0;
 
 AllegroNodeGraspController::AllegroNodeGraspController() {
          
@@ -190,15 +192,34 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
   if (condinit == 1) {
 
     current_state.position.resize(DOF_JOINTS);
-    for (int i = 0; i < 12; i++) {
-      current_state.position[i] = 0.0;
-    }
     
-    current_state.position[12] = 0.0;
-  
-    for (int i = 13; i < DOF_JOINTS; i++) {
-      current_state.position[i] = 0.0;
+    if(first_run != 1) {
+
+      for (int i = 0; i < DOF_JOINTS; i++) {
+        joint[i] = 0;
+        stop_table[i] = 0;
+      }
+
+      reverse = 1;
+      back = 1;
+      stop_ss << "open";
+      stop_msg.data = stop_ss.str();
+      stop_pub.publish(stop_msg);
+
+
+      for (int i = 0; i < DOF_JOINTS; i++) {
+        joint[i] = 0;
+        stop_table[i] = 0;
+        reverse_table[i] = 0;
+      }  
+
+      do{
+        back = 1;
+        current_state_pub.publish(current_state);
+      }while(went_back != 1);
     }
+
+    back = 0;
    
     for (int i = 0; i < DOF_JOINTS; i++) {
       distance[i] = desired_position[i] - current_state.position[i];
@@ -245,7 +266,7 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
   
     for (int i = 0; i < 12; i++) {
       if (joint[i] == 1 && stop_table[i] == 0) {
-        current_state.position[i] = 0;
+        current_state.position[i] = 0.0;
       }
     }
 
@@ -255,9 +276,18 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
 
     for (int i = 13; i < DOF_JOINTS; i++) {
       if (joint[i] == 1 && stop_table[i] == 0) {
-        current_state.position[i] = 0;
+        current_state.position[i] = 0.0;
       }
-    }  
+    }
+
+    for (int i = 0; i < DOF_JOINTS; i++)
+      for (int j = 0; j < DOF_JOINTS; j++) {
+        if (joint[i]*joint[j] == 1) {
+          went_back = 1;
+        }
+      } 
+
+
 
     //for (int i = 0; i < (DOF_JOINTS); i++)
     //{
@@ -296,6 +326,9 @@ void AllegroNodeGraspController::initControllerxx() {
   
   desired_state.position.resize(DOF_JOINTS);
   desired_state.velocity.resize(DOF_JOINTS);
+
+  first_run = 1;
+  went_back = 0;
 
   printf("*************************************\n");
   printf("         Grasp (BHand) Method        \n");
