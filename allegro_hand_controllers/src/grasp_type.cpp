@@ -82,8 +82,8 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
 
   else if (grasp_type.compare("stop") == 0) {
     for (int i = 0; i < DOF_JOINTS; i++) {
-      joint[i] = 0;
-      stop_table[i] = 0;
+      //joint[i] = 0;
+      stop_table[i] = 1;
     }
 
     reverse = 0;
@@ -96,7 +96,7 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
   else if (grasp_type.compare("close") == 0) {
 
     for (int i = 0; i < DOF_JOINTS; i++) {
-      joint[i] = 0;
+      //joint[i] = 0;
       stop_table[i] = 0;
     }
 
@@ -259,12 +259,12 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
       }
     }  
 
-    for (int i = 0; i < (DOF_JOINTS); i++)
-    {
-      if (joint[i] != 1 &&  stop_table[i] != 1 ) {
+    //for (int i = 0; i < (DOF_JOINTS); i++)
+    //{
+      //if (joint[i] != 1 &&  stop_table[i] != 1 ) {
         current_state_pub.publish(current_state);
-      }
-    }
+      //}
+    //}
   }
 //The stop condition if hand moves forward
   else if (back != 1){
@@ -279,12 +279,12 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
       }
     }
 
-    for (int i = 0; i < (DOF_JOINTS); i++)
-    {
-      if (joint[i] != 1 || stop_table[i] != 1) {
+    //for (int i = 0; i < (DOF_JOINTS); i++)
+    //{
+      //if (joint[i] != 1 || stop_table[i] != 1) {
         current_state_pub.publish(current_state);
-      }
-    }
+      //}
+    //}
   }  
 
   desired_state_pub.publish(current_state);
