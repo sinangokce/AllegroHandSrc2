@@ -281,7 +281,7 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
 
     for (int i = 0; i < (DOF_JOINTS); i++)
     {
-      if (joint[i] != 1) {
+      if (joint[i] != 1 || stop_table[i] != 1) {
         current_state_pub.publish(current_state);
       }
     }
