@@ -81,8 +81,6 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
   }
 
   else if (grasp_type.compare("stop") == 0) {
-
-    ROS_INFO("asd");
     for (int i = 0; i < DOF_JOINTS; i++) {
       joint[i] = 0;
       stop_table[i] = 0;
@@ -218,7 +216,6 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
 void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState &msg) {
   current_state = msg;
 
-
 //The stop condition changes if the hand moves back
   if (back == 1) {
 
@@ -254,7 +251,7 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
 
     if (joint[12] == 1 && stop_table[12] == 0) {
         current_state.position[12] = 0.0;
-      }
+    }
 
     for (int i = 13; i < DOF_JOINTS; i++) {
       if (joint[i] == 1 && stop_table[i] == 0) {
@@ -284,12 +281,11 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
 
     for (int i = 0; i < (DOF_JOINTS); i++)
     {
-      if (joint[i] != 1 &&  stop_table[i] != 1 ) {
+      if (joint[i] != 1) {
         current_state_pub.publish(current_state);
       }
     }
   }  
-
 
   desired_state_pub.publish(current_state);
 }
@@ -307,6 +303,7 @@ void AllegroNodeGraspController::initControllerxx() {
   printf("         Every command works.        \n");
   printf("*************************************\n");
 }
+
 void AllegroNodeGraspController::doIt() {
   ros::Rate rate(250.0);
   while (ros::ok()) {
@@ -314,6 +311,7 @@ void AllegroNodeGraspController::doIt() {
     ros::spinOnce();
   }
 }
+
 int main(int argc, char **argv) {
   ros::init(argc, argv, "allegro_hand_core_grasp");
   AllegroNodeGraspController grasping;
