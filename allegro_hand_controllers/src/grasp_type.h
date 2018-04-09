@@ -76,6 +76,7 @@ class AllegroNodeGraspController {
     ros::Publisher current_state_pub;
     ros::Publisher desired_state_pub;
     ros::Publisher stop_pub;
+    ros::Publisher wentback_pub;
 
 
     boost::mutex *mutex;
