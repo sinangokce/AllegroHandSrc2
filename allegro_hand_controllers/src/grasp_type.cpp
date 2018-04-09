@@ -65,19 +65,7 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
   back = 0;
   wentback_condition = 0;
 
-  if (grasp_type.compare("home") == 0) {
-    condinit = 1;
-    startclosing = 1;
-
-    for (int i = 0; i < DOF_JOINTS; i++)
-      desired_position[i] = home_pose[i]; 
-
-    stop_ss << "false";
-    stop_msg.data = stop_ss.str();
-    stop_pub.publish(stop_msg);
-  }
-
-  else if (grasp_type.compare("open") == 0) {
+  if (grasp_type.compare("open") == 0) {
 
     for (int i = 0; i < DOF_JOINTS; i++) {
       joint[i] = 0;
@@ -87,6 +75,7 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
     reverse = 1;
     back = 1;
     startclosing = 0;
+
     stop_ss << "open";
     stop_msg.data = stop_ss.str();
     stop_pub.publish(stop_msg);
@@ -101,13 +90,13 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
     reverse = 0;
     back = 0;
     startclosing = 0;
+
     stop_ss << "stop";
     stop_msg.data = stop_ss.str();
     stop_pub.publish(stop_msg);
   }
 
   else if (grasp_type.compare("close") == 0) {
-    condinit = 0;
     for (int i = 0; i < DOF_JOINTS; i++) {
       joint[i] = 0;
       stop_table[i] = 0;
@@ -116,7 +105,20 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
     reverse = 0;
     back = 0;
     startclosing = 1;
+
     stop_ss << "close";
+    stop_msg.data = stop_ss.str();
+    stop_pub.publish(stop_msg);
+  }
+
+  else if (grasp_type.compare("home") == 0) {
+    condinit = 1;
+    //startclosing = 1;
+
+    for (int i = 0; i < DOF_JOINTS; i++)
+      desired_position[i] = home_pose[i]; 
+
+    stop_ss << "false";
     stop_msg.data = stop_ss.str();
     stop_pub.publish(stop_msg);
   }
@@ -298,7 +300,7 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
   
   current_state = msg;
 
-  //The stop condition changes if the hand moves back
+  //The stop condition changes if the hand moves backward
   if (back == 1) {
 
     if (reverse == 1) {   //just to fill the table only once
@@ -311,7 +313,7 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
   
     for (int i = 0; i < DOF_JOINTS; i++) {
       if (reverse_table[i] == 0 && current_state.position[i] <= home_pose[i]) 
-        joint[i] = 1;
+        joint[i] = 1;                                                                 
       else if(reverse_table[i] == 1 && current_state.position[i] >= home_pose[i])
         joint[i] = 1;
     }
@@ -319,15 +321,14 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
 
     for (int i = 0; i < DOF_JOINTS; i++) {
       if (joint[i] == 1 && stop_table[i] == 0) {
-        current_state.position[i] = home_pose[i];
+        current_state.position[i] = home_pose[i];           //when a joint arrived to home pose it should stop at his posiiton
       }
     }
 
     if (condinit == 1) {
       if ( checkEquality(joint) ) {
-          
         wentback_ss << "wentback";
-        wentback_msg.data = wentback_ss.str();
+        wentback_msg.data = wentback_ss.str(); //this check is useful for initializion for a new pose.
         wentback_pub.publish(wentback_msg);
       }
       
@@ -358,7 +359,7 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
   
     for (int i = 0; i < DOF_JOINTS; i++) {
       if (joint[i] == 1 && stop_table[i] == 0) {
-        current_state.position[i] = desired_position[i];
+        current_state.position[i] = desired_position[i];    //when a joint arrived to desired position it should stop at his posiiton
       }
     }
 
