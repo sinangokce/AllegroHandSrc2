@@ -23,6 +23,7 @@ int startclosing = 1;
 int wentback;
 int wentback_condition;
 int first_run;
+int a; 
 
 AllegroNodeGraspController::AllegroNodeGraspController() {
          
@@ -53,13 +54,14 @@ void AllegroNodeGraspController::speedPerCallback(const handtracker::spper &msg)
 }
 
 void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::String::ConstPtr &msg) {
-  //ROS_INFO("CTRL: Heard: [%s]", msg->data.c_str());
+  ROS_INFO("CTRL: Heard: [%s]", msg->data.c_str());
   const std::string grasp_type = msg->data;
 
   std_msgs::String stop_msg;
   std::stringstream stop_ss;
   
-  condinit = 1;
+  condinit = 0;
+  a = 1;
   back = 0;
   wentback_condition = 0;
 
@@ -207,35 +209,53 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
     }
   }
 
-  else if (grasp_type.compare("stillgoingback") == 0) {
-    wentback_condition = 0;
-    ROS_INFO("wentback_condition : %d", wentback_condition);
+  else if (grasp_type.compare("wentback") == 0) {
+    condinit = 1;
+    wentback_condition = 1;
+    a = 0;
   }
-
-
 
   if (condinit == 1) {
 
     if (first_run != 1) {
-
       if(wentback_condition == 0) {
+
+        reverse = 1;
         back = 1;
+        startclosing = 0;
+
+        std_msgs::String stop_msg;
+        std::stringstream stop_ss;
+        stop_ss << "open";
+        stop_msg.data = stop_ss.str();
+        stop_pub.publish(stop_msg);
+
         current_state.position.resize(DOF_JOINTS);
-        //ROS_INFO("geri gideceeem");
+
         for (int i = 0; i < DOF_JOINTS; i++) {
           distance[i] = current_state.position[i] - home_pose[i];
-          current_state.velocity[i] = (distance[i]/8000);
+          current_state.velocity[i] = (distance[i]/6000);
           joint[i] = 0;
           stop_table[i] = 0;
           reverse_table[i] = 0;
         }
         wentback_condition = 1;
-        current_state_pub.publish(current_state);
+        if(a == 1)
+          current_state_pub.publish(current_state);
       }
 
       else if (wentback_condition == 1){
-        //ROS_INFO("ananzaaa");
+        
+        reverse = 0;
+        back = 0;
         startclosing = 1;
+
+        std_msgs::String stop_msg;
+        std::stringstream stop_ss;
+        stop_ss << "close";
+        stop_msg.data = stop_ss.str();
+        stop_pub.publish(stop_msg);
+
         current_state.position.resize(DOF_JOINTS);
 
         for (int i = 0; i < DOF_JOINTS; i++) {
@@ -269,18 +289,6 @@ void AllegroNodeGraspController::graspTypeControllerCallback(const std_msgs::Str
       current_state_pub.publish(current_state);
     }
 
-    /*startclosing = 1;
-    current_state.position.resize(DOF_JOINTS);
-    for (int i = 0; i < DOF_JOINTS; i++) {
-      distance[i] = desired_position[i] - current_state.position[i];
-      current_state.velocity[i] = (distance[i]/8000);
-      joint[i] = 0;
-      stop_table[i] = 0;
-      reverse_table[i] = 0;
-    }
-    
-    first_run = 0;
-    current_state_pub.publish(current_state);*/
   }
 }
 
@@ -316,14 +324,13 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
     }
 
     if (condinit == 1) {
-      for (int i = 0; i < DOF_JOINTS; i++) {
-        if (joint[i] != 1) {
-          //ROS_INFO("stillgoingback");
-          wentback_ss << "stillgoingback";
-          wentback_msg.data = wentback_ss.str();
-          wentback_pub.publish(wentback_msg);
-        }
+      if ( checkEquality(joint) ) {
+          
+        wentback_ss << "wentback";
+        wentback_msg.data = wentback_ss.str();
+        wentback_pub.publish(wentback_msg);
       }
+      
     }   
 
     current_state_pub.publish(current_state);
@@ -359,6 +366,14 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
   }  
 
   desired_state_pub.publish(current_state);
+}
+
+bool AllegroNodeGraspController::checkEquality(int array[]) {
+  for (int i = 0; i < DOF_JOINTS; i++) {
+    if(array[i] != 1)
+      return false;
+  }
+  return true;
 }
 
 void AllegroNodeGraspController::initControllerxx() {

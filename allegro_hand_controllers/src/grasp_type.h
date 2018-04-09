@@ -53,6 +53,8 @@ class AllegroNodeGraspController {
 
     void nextStateCallback(const sensor_msgs::JointState &msg);
 
+    bool checkEquality(int array[]);
+
     void initControllerxx();
 
     void doIt();
