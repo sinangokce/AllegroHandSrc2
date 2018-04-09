@@ -10,11 +10,6 @@
 #include "std_msgs/Float32.h"
 #include "handtracker/spper.h"
 
-
-
-
-
-
 #include <string>
 #include <boost/thread/thread.hpp>
 
@@ -90,13 +85,21 @@ class AllegroNodeGraspController {
     handtracker::spper speedMsg;
 
     
-    double home_pose[16] =
+    /*double home_pose[16] =
         {
             // Default (HOME) position (degrees), set at system start if
             // no 'initial_position.yaml' parameter is loaded.
             0.0, -10.0, 45.0, 45.0,  0.0, -10.0, 45.0, 45.0,
             5.0, -5.0, 50.0, 45.0, 60.0, 25.0, 15.0, 45.0
-        };
+        };*/
+
+    double home_pose[16] =
+        {
+            // Default (HOME) position (degrees), set at system start if
+            // no 'initial_position.yaml' parameter is loaded.
+            0.0,  -0.17, 0.79, 0.79,  0.0, -0.17, 0.79, 0.79,
+            0.09, -0.09, 0.87, 0.79,  1.05, 0.44, 0.26, 0.79
+        };    
 
     double power[16] =
         {
@@ -113,7 +116,7 @@ class AllegroNodeGraspController {
 
     double pinch[16] =
         {
-            0, 0.834561882, 0.887520644999999, 0.9011554200000005,  0.0, 0.0, 0.0, 0.0,
+            0.0, 0.834561882, 0.887520644999999, 0.9011554200000005,  0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0, 1.351306242, 0, 0.757425734999998, 0.28598694300000005
         };
 
