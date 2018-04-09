@@ -222,28 +222,28 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
   
     reverse = 0;
 
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < DOF_JOINTS; i++) {
       if (reverse_table[i] == 0 && current_state.position[i] <= DEGREES_TO_RADIANS(home_pose[i])) 
         joint[i] = 1;
       else if(reverse_table[i] == 1 && current_state.position[i] >= DEGREES_TO_RADIANS(home_pose[i]))
         joint[i] = 1;
     }
 
-    if (current_state.position[12] <= DEGREES_TO_RADIANS(home_pose[12])) 
+    /*if (current_state.position[12] <= DEGREES_TO_RADIANS(home_pose[12])) 
         joint[12] = 1;
 
     for (int i = 13; i < DOF_JOINTS; i++) {
       if (current_state.position[i] <= DEGREES_TO_RADIANS(home_pose[i])) 
         joint[i] = 1;
-    }  
+    }  */
   
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < DOF_JOINTS; i++) {
       if (joint[i] == 1 && stop_table[i] == 0) {
         current_state.position[i] = DEGREES_TO_RADIANS(home_pose[i]);
       }
     }
 
-    if (joint[12] == 1 && stop_table[12] == 0) {
+    /*if (joint[12] == 1 && stop_table[12] == 0) {
         current_state.position[12] = DEGREES_TO_RADIANS(home_pose[12]);
     }
 
@@ -251,7 +251,7 @@ void AllegroNodeGraspController::nextStateCallback(const sensor_msgs::JointState
       if (joint[i] == 1 && stop_table[i] == 0) {
         current_state.position[i] = DEGREES_TO_RADIANS(home_pose[i]);
       }
-    }  
+    }  */
 
     //for (int i = 0; i < (DOF_JOINTS); i++)
     //{
