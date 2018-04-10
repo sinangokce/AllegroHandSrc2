@@ -124,6 +124,8 @@ void currentListener::currentListenerCallback(const sensor_msgs::JointState &msg
       velocity[i] = current_joint_state.velocity[i];
   }
 
+  ROS_INFO("zrzrz");
+
   if(back != 1) {
     std::vector<double> each_step;
     for(int i = 0; i < DOF_JOINTS; i++){
