@@ -268,6 +268,14 @@ void AHKeyboard::keyLoop()
         dirty = true;
         break;  
 
+      case KEYCODE_0:
+        ROS_DEBUG("0_key: 0vel");
+        ss << "zero";
+        dirty == false;
+        msg.data = ss.str();
+        vel_pub_.publish(msg);
+        break;
+
       case KEYCODE_1:
         ROS_DEBUG("1_key: 1vel");
         ss << "one";

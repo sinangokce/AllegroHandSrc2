@@ -76,6 +76,10 @@ void currentListener::stopCallback(const std_msgs::String::ConstPtr &msg) {
     speedPer = 5;
   }
 
+  if (condition.compare("zero") == 0) {
+    speedPer = 0;
+  }
+
 
   if (condition.compare("false") == 0) {
     for (int i = 0; i < DOF_JOINTS; i++) 
