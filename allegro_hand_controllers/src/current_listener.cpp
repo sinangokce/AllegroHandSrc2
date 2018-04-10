@@ -27,6 +27,7 @@ double dt;
 int stop_table[16];
 bool cond;
 int back = 0;
+int speedPer = 1;
 
 class currentListener
 {
@@ -62,6 +63,19 @@ currentListener::currentListener() {
 
 void currentListener::stopCallback(const std_msgs::String::ConstPtr &msg) {
   const std::string condition = msg->data;
+
+  if (condition.compare("one") == 0) {
+    speedPer = 1;
+  }
+
+  if (condition.compare("two") == 0) {
+    speedPer = 2;
+  }
+
+  if (condition.compare("five") == 0) {
+    speedPer = 5;
+  }
+
 
   if (condition.compare("false") == 0) {
     for (int i = 0; i < DOF_JOINTS; i++) 
@@ -127,7 +141,7 @@ void currentListener::currentListenerCallback(const sensor_msgs::JointState &msg
     if (stop_table[i] == 1)
       velocity[i] = 0.0; 
     else 
-      velocity[i] = current_joint_state.velocity[i];
+      velocity[i] = current_joint_state.velocity[i]*speedPer;
   }
   
   if (back == 1){

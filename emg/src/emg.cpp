@@ -118,13 +118,15 @@ class AHKeyboard
   int count_;
   float edit_;
   ros::Publisher cmd_pub_;
+  ros::Publisher vel_pub_;
 };
 
 AHKeyboard::AHKeyboard():
     count_(0),
     edit_(0.0)
 {
-  cmd_pub_   = nh_.advertise<std_msgs::String>("allegroHand_0/libsss_cmd", 1);
+  cmd_pub_  = nh_.advertise<std_msgs::String>("allegroHand_0/libsss_cmd", 1);
+  vel_pub_  = nh_.advertise<std_msgs::String>("allegroHand_0/stop_topic", 1); 
 }
 
 //int finger_num;
@@ -265,6 +267,30 @@ void AHKeyboard::keyLoop()
         ss << "close";
         dirty = true;
         break;  
+
+      case KEYCODE_1:
+        ROS_DEBUG("1_key: 1vel");
+        ss << "one";
+        dirty == false;
+        msg.data = ss.str();
+        vel_pub_.publish(msg);
+        break; 
+
+      case KEYCODE_2:
+        ROS_DEBUG("2_key: 2vel");
+        ss << "two";
+        dirty == false;
+        msg.data = ss.str();
+        vel_pub_.publish(msg);
+        break; 
+
+      case KEYCODE_5:
+        ROS_DEBUG("5_key: 5vel");
+        ss << "five";
+        dirty == false;
+        msg.data = ss.str();
+        vel_pub_.publish(msg);
+        break;        
     }
 
     if(dirty ==true)
